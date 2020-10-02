@@ -4,9 +4,20 @@ from player import Player
 
 class Game:
     def __init__(self):
+        self.level = 1
         self.board = Board(9)
         self.player = Player("A", "^", self.board.player_location)
         self.playing = True
+        self.exit_location = [0, 0]
+        self.walls = []
+        self.new_level()
+
+    def new_level(self):
+        self.board = Board(9)
+        self.exit_location = self.board.place_random("X")
+        self.walls = []
+        for w in range(self.board.size * self.level):
+            self.walls.append(self.board.place_random("O"))
 
     def loop(self):
         while self.playing:
@@ -16,6 +27,7 @@ class Game:
         print("Thanks for playing!")
 
     def update_display(self):
+        print(f"LEVEL: {self.level}")
         self.board.refresh()
 
     def user_input(self):
@@ -37,6 +49,7 @@ class Game:
         y = self.player.location[1]
         y = y - 1
         self.board.clear()
+        self.board.place(self.exit_location[0], self.exit_location[1], "X")
         self.board.place(x, y, self.player.symbol)
         self.player.location[0] = x
         self.player.location[1] = y
@@ -46,6 +59,7 @@ class Game:
         y = self.player.location[1]
         y = y + 1
         self.board.clear()
+        self.board.place(self.exit_location[0], self.exit_location[1], "X")
         self.board.place(x, y, self.player.symbol)
         self.player.location[0] = x
         self.player.location[1] = y
@@ -55,6 +69,7 @@ class Game:
         y = self.player.location[1]
         x = x - 1
         self.board.clear()
+        self.board.place(self.exit_location[0], self.exit_location[1], "X")
         self.board.place(x, y, self.player.symbol)
         self.player.location[0] = x
         self.player.location[1] = y
@@ -64,12 +79,16 @@ class Game:
         y = self.player.location[1]
         x = x + 1
         self.board.clear()
+        self.board.place(self.exit_location[0], self.exit_location[1], "X")
         self.board.place(x, y, self.player.symbol)
         self.player.location[0] = x
         self.player.location[1] = y
 
     def apply_rules(self):
-        pass
+        if self.player.location == self.exit_location:
+            print("YOU WIN THIS LEVEL")
+            self.level += 1
+            self.new_level()
 
 
 game = Game()
