@@ -1,5 +1,5 @@
 from board import Board
-from player import Player, Monster
+from player import Player, Monster, Treasure
 import random
 
 
@@ -21,12 +21,21 @@ class Game:
         self.exit_location = self.board.place_random("X")
         self.walls = []
         self.monsters = []
+        self.treasures = []
+
+        for t in range((self.board.size // 3) * self.level):
+            treasure = Treasure()
+            treasure.location = self.board.place_random("T")
+            self.treasures.append(treasure)
+
         for m in range((self.board.size // 2) * self.level):
             monster = Monster("M")
             monster.location = self.board.place_random("M")
             self.monsters.append(monster)
+
         for w in range((self.board.size // 2) * self.level):
             self.walls.append(self.board.place_random("O"))
+
         self.player.health = 100
 
     def loop(self):
@@ -74,6 +83,9 @@ class Game:
     def populate(self):
         self.board.clear()
 
+        for treasure in self.treasures:
+            self.board.place(treasure.location[0], treasure.location[1], "T")
+
         for monster in self.monsters:
             self.board.place(monster.location[0], monster.location[1], "M")
 
@@ -89,8 +101,13 @@ class Game:
             if self.player.location == w:
                 self.player.location = self.player.old_location
                 self.player.location = [self.player.old_location[0], self.player.old_location[1]]
-
                 print("BLOCKED!")
+
+        for treasure in self.treasures:
+            if self.player.location == treasure.location:
+                print("COLLECT!")
+                self.collect(self.player, treasure)
+
         for monster in self.monsters:
             if self.player.location == monster.location:
                 print("FIGHT!")
@@ -100,6 +117,12 @@ class Game:
             print(f"YOU WON THIS LEVEL IN {self.moves} MOVES!")
             self.level += 1
             self.new_level()
+
+    def collect(self, player, treasure):
+        for item in treasure.items:
+            print(f"Player {player.name} collects {item.quantity} {item.name}!")
+            player.items.append(item)
+        self.treasures.remove(treasure)
 
     def fight(self, c1, c2):
         round_count = 1
