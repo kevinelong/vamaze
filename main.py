@@ -28,11 +28,13 @@ class Game:
 
     def update_display(self):
         print(f"LEVEL: {self.level}")
+        self.populate()
         self.board.refresh()
 
     def user_input(self):
         text = input("Which direction? or q to quit.")
         upper = text.upper()
+        self.player.old_location = self.player.location
         if upper == "Q":
             self.playing = False
         elif upper in ["NORTH", "UP", "W"]:
@@ -45,46 +47,32 @@ class Game:
             self.move_player_right()
 
     def move_player_up(self):
-        x = self.player.location[0]
-        y = self.player.location[1]
-        y = y - 1
-        self.board.clear()
-        self.board.place(self.exit_location[0], self.exit_location[1], "X")
-        self.board.place(x, y, self.player.symbol)
-        self.player.location[0] = x
-        self.player.location[1] = y
+        self.player.location[1] -= 1
 
     def move_player_down(self):
-        x = self.player.location[0]
-        y = self.player.location[1]
-        y = y + 1
-        self.board.clear()
-        self.board.place(self.exit_location[0], self.exit_location[1], "X")
-        self.board.place(x, y, self.player.symbol)
-        self.player.location[0] = x
-        self.player.location[1] = y
+        self.player.location[1] += 1
 
     def move_player_left(self):
-        x = self.player.location[0]
-        y = self.player.location[1]
-        x = x - 1
-        self.board.clear()
-        self.board.place(self.exit_location[0], self.exit_location[1], "X")
-        self.board.place(x, y, self.player.symbol)
-        self.player.location[0] = x
-        self.player.location[1] = y
+        self.player.location[0] -= 1
 
     def move_player_right(self):
-        x = self.player.location[0]
-        y = self.player.location[1]
-        x = x + 1
+        self.player.location[0] += 1
+
+    def populate(self):
         self.board.clear()
+
+        for w in self.walls:
+            self.board.place(w[0], w[1], "O")
         self.board.place(self.exit_location[0], self.exit_location[1], "X")
-        self.board.place(x, y, self.player.symbol)
-        self.player.location[0] = x
-        self.player.location[1] = y
+        self.board.place(self.player.location[0], self.player.location[1], self.player.symbol)
 
     def apply_rules(self):
+        #check for collisions
+        for w in self.walls:
+            if self.player.location == w:
+                self.player.location = self.player.old_location
+                print("block")
+
         if self.player.location == self.exit_location:
             print("YOU WIN THIS LEVEL")
             self.level += 1

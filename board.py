@@ -9,8 +9,13 @@ class Board:
         self.board[y][x] = symbol
 
     def place_random(self, symbol="^"):
-        row = random.randint(0, self.size - 1)
-        column = random.randint(0, self.size - 1)
+        occupied = True
+        while occupied:
+            row = random.randint(0, self.size - 1)
+            column = random.randint(0, self.size - 1)
+            if self.board[row][column] == ".":
+                occupied = False
+
         self.place(column, row, symbol)
         return [column, row]
 

@@ -3,4 +3,5 @@ class Player:
         self.name = name
         self.symbol = symbol
         self.location = location
+        self.old_location = location
 
